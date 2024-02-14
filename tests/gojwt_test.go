@@ -7,12 +7,12 @@ import (
 )
 
 var (
-	jwt    = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhdXRoIiwiZXhwIjoxNzAyMTYxMzg4LCJhdWQiOiJ0b2RvIiwic3ViIjoidXVpZCIsIm5hbWUiOiJBbGV4IFRoZSBNYWQiLCJyb2xlcyI6WyJUT0RPIl19.DSIhbioL9esS0gsiliNl9rUFYaLaZAciVvNG7e7OxyI"
-	secret = "AixSmyAlU0Gh-Tvpw_ytFPLtc2GyVCPG9uxlsBDsmy4"
+	validToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhdXRoIiwiZXhwIjoxNzAyMTYxMzg4LCJhdWQiOiJ0b2RvIiwic3ViIjoidXVpZCIsIm5hbWUiOiJBbGV4IFRoZSBNYWQiLCJyb2xlcyI6WyJUT0RPIl19.DSIhbioL9esS0gsiliNl9rUFYaLaZAciVvNG7e7OxyI"
+	secret     = "AixSmyAlU0Gh-Tvpw_ytFPLtc2GyVCPG9uxlsBDsmy4"
 )
 
 func TestParseResult(t *testing.T) {
-	token, err := gojwt.Parse(jwt)
+	token, err := jwt.Parse(validToken)
 	if err != nil {
 		t.Errorf("Received error: %s", err)
 
@@ -30,42 +30,42 @@ func TestParseResult(t *testing.T) {
 }
 
 func TestParseErrors(t *testing.T) {
-	_, err := gojwt.Parse("abc.def")
+	_, err := jwt.Parse("abc.def")
 	if err == nil {
 		t.Errorf(`Expected to return error: "invalid token"`)
 	} else {
 		assert(t, "invalid token", err.Error())
 	}
 
-	_, err = gojwt.Parse("abc.def.ghi")
+	_, err = jwt.Parse("abc.def.ghi")
 	if err == nil {
 		t.Errorf(`Expected to return error: "invalid headers"`)
 	} else {
 		assert(t, "invalid headers", err.Error())
 	}
 
-	_, err = gojwt.Parse("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.def.ghi")
+	_, err = jwt.Parse("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.def.ghi")
 	if err == nil {
 		t.Errorf(`Expected to return error: "invalid claims"`)
 	} else {
 		assert(t, "invalid claims", err.Error())
 	}
 
-	_, err = gojwt.Parse("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhdXRoIiwiZXhwIjoxNzAyMTYxMzg4LCJhdWQiOiJ0b2RvIiwic3ViIjoidXVpZCIsIm5hbWUiOiJBbGV4IFRoZSBNYWQiLCJyb2xlcyI6WyJUT0RPIl19.abc:")
+	_, err = jwt.Parse("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhdXRoIiwiZXhwIjoxNzAyMTYxMzg4LCJhdWQiOiJ0b2RvIiwic3ViIjoidXVpZCIsIm5hbWUiOiJBbGV4IFRoZSBNYWQiLCJyb2xlcyI6WyJUT0RPIl19.abc:")
 	if err == nil {
 		t.Errorf(`Expected to return error: "invalid signature"`)
 	} else {
 		assert(t, "invalid signature", err.Error())
 	}
 
-	_, err = gojwt.Parse("eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhdXRoIiwiZXhwIjoxNzAyMTYxMzg4LCJhdWQiOiIiLCJzdWIiOiIiLCJuYW1lIjoiIiwicm9sZXMiOm51bGx9.CX3vnWXs-hb0AYQWP0RqVjcHbSzTKWwgIfyCq1fwVPo")
+	_, err = jwt.Parse("eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhdXRoIiwiZXhwIjoxNzAyMTYxMzg4LCJhdWQiOiIiLCJzdWIiOiIiLCJuYW1lIjoiIiwicm9sZXMiOm51bGx9.CX3vnWXs-hb0AYQWP0RqVjcHbSzTKWwgIfyCq1fwVPo")
 	if err == nil {
 		t.Errorf(`Expected to return error: "invalid alg"`)
 	} else {
 		assert(t, "invalid alg", err.Error())
 	}
 
-	_, err = gojwt.Parse("eyJhbGciOiJIUzI1NiIsInR5cCI6IklOVkFMSURfVFlQIn0.eyJpc3MiOiJhdXRoIiwiZXhwIjoxNzAyMTYxMzg4LCJhdWQiOiIiLCJzdWIiOiIiLCJuYW1lIjoiIiwicm9sZXMiOm51bGx9.6BPLmsnhQETeKeb7BzpBkEj71JPp-3wPlHOSZw2m1Rg")
+	_, err = jwt.Parse("eyJhbGciOiJIUzI1NiIsInR5cCI6IklOVkFMSURfVFlQIn0.eyJpc3MiOiJhdXRoIiwiZXhwIjoxNzAyMTYxMzg4LCJhdWQiOiIiLCJzdWIiOiIiLCJuYW1lIjoiIiwicm9sZXMiOm51bGx9.6BPLmsnhQETeKeb7BzpBkEj71JPp-3wPlHOSZw2m1Rg")
 	if err == nil {
 		t.Errorf(`Expected to return error: "invalid typ"`)
 
@@ -76,7 +76,7 @@ func TestParseErrors(t *testing.T) {
 }
 
 func TestIsValid(t *testing.T) {
-	token, err := gojwt.Parse(jwt)
+	token, err := jwt.Parse(validToken)
 	if err != nil {
 		t.Errorf("Received error: %s", err)
 
@@ -88,12 +88,12 @@ func TestIsValid(t *testing.T) {
 }
 
 func TestSign(t *testing.T) {
-	c := gojwt.Claims{
+	c := jwt.Claims{
 		Issuer:     "auth",
 		Expiration: 1702161388,
 	}
 
-	token := gojwt.Sign(c, secret)
+	token := jwt.Sign(c, secret)
 
 	assert(
 		t,
