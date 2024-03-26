@@ -12,7 +12,7 @@ func Parse(jwt string) (*Token[Claims], error) {
 	return ParseCustomClaims(jwt, Claims{})
 }
 
-func ParseCustomClaims[C any](jwt string, c C) (*Token[C], error) {
+func ParseCustomClaims[C any](jwt string, claims C) (*Token[C], error) {
 	if jwt == "" {
 		return nil, errors.New("invalid token")
 	}
@@ -35,8 +35,7 @@ func ParseCustomClaims[C any](jwt string, c C) (*Token[C], error) {
 		return nil, errors.New("invalid typ")
 	}
 
-	claims := &c
-	err = decodeBase64JSON(parts[1], claims)
+	err = decodeBase64JSON(parts[1], &claims)
 	if err != nil {
 		return nil, errors.New("invalid claims")
 	}
@@ -49,7 +48,7 @@ func ParseCustomClaims[C any](jwt string, c C) (*Token[C], error) {
 	t := new(Token[C])
 	t.Raw = jwt
 	t.Header = *header
-	t.Claims = *claims
+	t.Claims = claims
 	t.Signature = signature
 
 	return t, nil
