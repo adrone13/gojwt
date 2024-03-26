@@ -7,8 +7,9 @@ import (
 )
 
 var (
-	validToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhdXRoIiwiZXhwIjoxNzAyMTYxMzg4LCJhdWQiOiJ0b2RvIiwic3ViIjoidXVpZCIsIm5hbWUiOiJBbGV4IFRoZSBNYWQiLCJyb2xlcyI6WyJUT0RPIl19.DSIhbioL9esS0gsiliNl9rUFYaLaZAciVvNG7e7OxyI"
-	secret     = "AixSmyAlU0Gh-Tvpw_ytFPLtc2GyVCPG9uxlsBDsmy4"
+	validToken            = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhdXRoIiwiZXhwIjoxNzAyMTYxMzg4LCJhdWQiOiJ0b2RvIiwic3ViIjoidXVpZCIsIm5hbWUiOiJBbGV4IFRoZSBNYWQiLCJyb2xlcyI6WyJUT0RPIl19.DSIhbioL9esS0gsiliNl9rUFYaLaZAciVvNG7e7OxyI"
+	validCustomClaimToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOjE3MDQxMTA0MDAsInN1YiI6InVzZXJfaWQiLCJsYXN0X25hbWUiOiJVc2VyIExhc3QgTmFtZSJ9.94ZTopU6JQom549Hrof3-7MBpC53ycb8BrjUcNyxbl0"
+	secret                = "AixSmyAlU0Gh-Tvpw_ytFPLtc2GyVCPG9uxlsBDsmy4"
 )
 
 func TestParseResult(t *testing.T) {
@@ -27,6 +28,27 @@ func TestParseResult(t *testing.T) {
 	assert(t, "uuid", token.Claims.Subject)
 	assert(t, "Alex The Mad", token.Claims.Name)
 	assertCol(t, []string{"TODO"}, token.Claims.Roles)
+}
+
+func TestParseCustomClaimsResult(t *testing.T) {
+	type CustomClaims struct {
+		Expiration int64  `json:"iss"`
+		Subject    string `json:"sub"`
+		LastName   string `json:"last_name"`
+	}
+
+	token, err := jwt.ParseCustomClaims(validCustomClaimToken, CustomClaims{})
+	if err != nil {
+		t.Errorf("Received error: %s", err)
+
+		return
+	}
+
+	assert(t, "HS256", token.Header.Algorithm)
+	assert(t, "JWT", token.Header.Type)
+	assert(t, 1704110400, token.Claims.Expiration)
+	assert(t, "user_id", token.Claims.Subject)
+	assert(t, "User Last Name", token.Claims.LastName)
 }
 
 func TestParseErrors(t *testing.T) {
