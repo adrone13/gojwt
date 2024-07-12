@@ -6,12 +6,18 @@ package main
 
 import (
 	"fmt"
-	"time"
-
 	"github.com/adrone13/gojwt"
+	"log"
+	"time"
 )
 
 var secret = "your_jwt_secret"
+
+type CustomClaims struct {
+	Expiration int64  `json:"iss"`
+	Subject    string `json:"sub"`
+	LastName   string `json:"last_name"`
+}
 
 func main() {
 	exp, _ := time.Parse(time.RFC3339, "2024-01-01T12:00:00.000Z")
